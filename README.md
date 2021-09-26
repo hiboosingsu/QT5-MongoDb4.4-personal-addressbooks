@@ -2,6 +2,8 @@
 
 Use QT5.12 &amp; Mongodb 4.4.9 building personal addressbooks sample code. 
 
+【海部性樹原創作品集】
+
 本範例程式，編譯環境： 
 
 OS:Ubuntu 18.04 
