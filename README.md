@@ -14,6 +14,6 @@ Mongodb Version:4.4
 
 Mongodb c driver : 1.17.3 + 
 
-*操作本程式前，建議請先將libmongoc-1.0.so，libbson-1.0.so兩隻靜態程式庫編譯好，丟入 /usr/local/lib 目錄內，才能驅動mongodb。
+*操作本程式前，建議請先安裝mongodb c driver安裝好，並確認/usr/local/lib 目錄內是否存在libmongoc-1.0.so，libbson-1.0.so兩隻靜態程式庫，才能驅動mongodb。
 
-
+* [Installing the MongoDB C Driver (libmongoc) and BSON library (libbson).](http://mongoc.org/libmongoc/current/installing.html)
