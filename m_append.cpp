@@ -136,14 +136,18 @@ void M_append::append(QVariantMap xData)
     /* build a doc to execute */
     doc = bson_new();
     xData.remove("oid");
-    QString ts;
-   for(QVariantMap::const_iterator iter = xData.constBegin(); iter != xData.constEnd(); ++iter) {
-        ts = iter.key();
-        qDebug() << "fn:" << ts << " data:" << xData[ts].toString();
+    
+    BSON_APPEND_UTF8(doc,"name",xData["name"].toString().toLocal8Bit());
+    BSON_APPEND_UTF8(doc,"phone",xData["phone"].toString().toLocal8Bit());
+    BSON_APPEND_UTF8(doc,"memo",xData["memo"].toString().toLocal8Bit());
 
-        BSON_APPEND_UTF8(doc,ts.toLocal8Bit(),xData[ts].toString().toLocal8Bit());
-
-    }
+//如果欄位很多，可使用for語法拆解分裝
+//    QString ts;
+//   for(QVariantMap::const_iterator iter = xData.constBegin(); iter != xData.constEnd(); ++iter) {
+//        ts = iter.key();
+//        qDebug() << "fn:" << ts << " data:" << xData[ts].toString();
+//        BSON_APPEND_UTF8(doc,ts.toLocal8Bit(),xData[ts].toString().toLocal8Bit());
+//    }
 
     if (!mongoc_collection_insert_one(collection, doc, NULL, NULL, &error)) {
           qDebug() << "Insert failed:" << error.message << "\n";
@@ -173,19 +177,27 @@ void M_append::updated(QVariantMap xData)
     bson_oid_init_from_string (&oid, xData["oid"].toString().toUtf8());
     filter = BCON_NEW ("_id", BCON_OID (&oid));
     xData.remove("oid");
-    QString ts;
-
-
-    for(QVariantMap::const_iterator iter = xData.constBegin(); iter != xData.constEnd(); ++iter) {
-        ts = iter.key();
-     //   qDebug() << "fn:" << ts << " data:" << xData[ts].toString();
-        update = BCON_NEW ("$set","{",BCON_UTF8(ts.toLocal8Bit()),BCON_UTF8(xData[ts].toString().toLocal8Bit()),"}");
-         if (!mongoc_collection_update_one (collection, filter, update, NULL, NULL, &error)) {
-                  qDebug() << "Updated failed:" << error.message << "\n";
-         }
-         bson_destroy (update);
-
+    update = BCON_NEW ("$set","{",
+                       "name", BCON_UTF8(xData["name"].toString().toLocal8Bit()),
+                       "phone", BCON_UTF8(xData["phone"].toString().toLocal8Bit()),
+                       "memo", BCON_UTF8(xData["memo"].toString().toLocal8Bit()),
+            "}");
+    if (!mongoc_collection_update_one (collection, filter, update, NULL, NULL, &error)) {
+       qDebug() << "Updated failed:" << error.message << "\n";
     }
+    bson_destroy (update);
+    
+//如果欄位很多，可使用for語法拆解分裝    
+//    QString ts;
+//    for(QVariantMap::const_iterator iter = xData.constBegin(); iter != xData.constEnd(); ++iter) {
+//        ts = iter.key();
+     //   qDebug() << "fn:" << ts << " data:" << xData[ts].toString();
+//        update = BCON_NEW ("$set","{",BCON_UTF8(ts.toLocal8Bit()),BCON_UTF8(xData[ts].toString().toLocal8Bit()),"}");
+//         if (!mongoc_collection_update_one (collection, filter, update, NULL, NULL, &error)) {
+//                  qDebug() << "Updated failed:" << error.message << "\n";
+//         }
+//         bson_destroy (update);
+//    }
 
     mongoc_collection_destroy (collection);
     mongoc_database_destroy (database);
